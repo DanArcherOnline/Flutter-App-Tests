@@ -8,21 +8,20 @@ class ButtonActions extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: _mapStateToActionButtons(
-        timerBloc: BlocProvider.of<TimerBloc>(context),
+        timerCubit: BlocProvider.of<TimerCubit>(context),
       ),
     );
   }
 
   List<Widget> _mapStateToActionButtons({
-    TimerBloc timerBloc,
+    TimerCubit timerCubit,
   }) {
-    final TimerState currentState = timerBloc.state;
+    final TimerState currentState = timerCubit.state;
     if (currentState is TimerInitial) {
       return [
         FloatingActionButton(
           child: Icon(Icons.play_arrow),
-          onPressed: () =>
-              timerBloc.add(TimerStarted(duration: currentState.duration)),
+          onPressed: () => timerCubit.start(currentState.duration),
         ),
       ];
     }
@@ -30,11 +29,11 @@ class ButtonActions extends StatelessWidget {
       return [
         FloatingActionButton(
           child: Icon(Icons.pause),
-          onPressed: () => timerBloc.add(TimerPaused()),
+          onPressed: () => timerCubit.pause(),
         ),
         FloatingActionButton(
           child: Icon(Icons.replay),
-          onPressed: () => timerBloc.add(TimerReset()),
+          onPressed: () => timerCubit.reset(),
         ),
       ];
     }
@@ -42,11 +41,11 @@ class ButtonActions extends StatelessWidget {
       return [
         FloatingActionButton(
           child: Icon(Icons.play_arrow),
-          onPressed: () => timerBloc.add(TimerResumed()),
+          onPressed: () => timerCubit.resume(),
         ),
         FloatingActionButton(
           child: Icon(Icons.replay),
-          onPressed: () => timerBloc.add(TimerReset()),
+          onPressed: () => timerCubit.reset(),
         ),
       ];
     }
@@ -54,7 +53,7 @@ class ButtonActions extends StatelessWidget {
       return [
         FloatingActionButton(
           child: Icon(Icons.replay),
-          onPressed: () => timerBloc.add(TimerReset()),
+          onPressed: () => timerCubit.reset(),
         ),
       ];
     }

@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
       ),
       title: 'Flutter Timer',
       home: BlocProvider(
-        create: (context) => TimerBloc(ticker: Ticker()),
+        create: (context) => TimerCubit(ticker: Ticker()),
         child: Timer(),
       ),
     );

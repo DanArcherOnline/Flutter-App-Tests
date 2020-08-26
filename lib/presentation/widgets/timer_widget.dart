@@ -20,7 +20,7 @@ class Timer extends StatelessWidget {
           Padding(
             padding: EdgeInsets.symmetric(vertical: 100.0),
             child: Center(
-              child: BlocBuilder<TimerBloc, TimerState>(
+              child: BlocBuilder<TimerCubit, TimerState>(
                 builder: (context, state) {
                   final String minutesStr = ((state.duration / 60) % 60)
                       .floor()
@@ -36,7 +36,7 @@ class Timer extends StatelessWidget {
               ),
             ),
           ),
-          BlocBuilder<TimerBloc, TimerState>(
+          BlocBuilder<TimerCubit, TimerState>(
             buildWhen: (previousState, state) =>
                 state.runtimeType != previousState.runtimeType,
             builder: (context, state) => ButtonActions(),
