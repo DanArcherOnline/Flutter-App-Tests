@@ -22,16 +22,25 @@ class Timer extends StatelessWidget {
             child: Center(
               child: BlocBuilder<TimerCubit, TimerState>(
                 builder: (context, state) {
-                  final String minutesStr = ((state.duration / 60) % 60)
-                      .floor()
-                      .toString()
-                      .padLeft(2, '0');
-                  final String secondsStr =
-                      (state.duration % 60).floor().toString().padLeft(2, '0');
-                  return Text(
-                    '$minutesStr:$secondsStr',
-                    style: Timer.timerTextStyle,
-                  );
+                  if (state is TimerLoad) {
+                    context.bloc<TimerCubit>().loadTimerFromBackUp();
+                    return Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  } else {
+                    final String minutesStr = ((state.duration / 60) % 60)
+                        .floor()
+                        .toString()
+                        .padLeft(2, '0');
+                    final String secondsStr = (state.duration % 60)
+                        .floor()
+                        .toString()
+                        .padLeft(2, '0');
+                    return Text(
+                      '$minutesStr:$secondsStr',
+                      style: Timer.timerTextStyle,
+                    );
+                  }
                 },
               ),
             ),

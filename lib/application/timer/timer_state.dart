@@ -1,6 +1,11 @@
 import 'package:equatable/equatable.dart';
 
 abstract class TimerState extends Equatable {
+  static const INITIAL = 'initial';
+  static const PAUSED = 'paused';
+  static const RUNNING = 'running';
+  static const COMPLETE = 'complete';
+
   final int duration;
 
   const TimerState(this.duration);
@@ -14,6 +19,13 @@ class TimerInitial extends TimerState {
 
   @override
   String toString() => 'TimerInitial { duration: $duration }';
+}
+
+class TimerLoad extends TimerState {
+  const TimerLoad() : super(60);
+
+  @override
+  String toString() => 'TimerRunPause { duration: $duration }';
 }
 
 class TimerRunPause extends TimerState {
