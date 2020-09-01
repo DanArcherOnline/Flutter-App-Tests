@@ -8,6 +8,7 @@ class PersistTimerStateManager {
 
   static const REMAING_DURATION_KEY = 'remainingDuration';
   static const TIMER_STATE_KEY = 'timerState';
+  static const LAST_TIME_KEY = 'lastTime';
 
   PersistTimerStateManager._();
 
@@ -18,8 +19,6 @@ class PersistTimerStateManager {
         _sharedPreferences = await SharedPreferences.getInstance();
         _completer.complete(PersistTimerStateManager._());
       } on Exception catch (e) {
-        // If there's an error, explicitly return the future with an error.
-        // then set the completer to null so we can retry.
         _completer.completeError(e);
         final Future<PersistTimerStateManager> persistStateManagerFuture =
             _completer.future;
@@ -34,7 +33,11 @@ class PersistTimerStateManager {
       int remainingDuration, String timerState) async {
     await _sharedPreferences.setInt(REMAING_DURATION_KEY, remainingDuration);
     await _sharedPreferences.setString(TIMER_STATE_KEY, timerState);
-    print('State Saved: Duration($remainingDuration) - State($timerState)');
+    int currentTime = DateTime.now().millisecondsSinceEpoch;
+    await _sharedPreferences.setInt(LAST_TIME_KEY, currentTime);
+    print('State Saved: ');
+    print(
+        'State Saved: Current Time($currentTime) - Duration($remainingDuration) - State($timerState)');
   }
 
   Future<int> getRemainingDuration() async {
@@ -43,5 +46,9 @@ class PersistTimerStateManager {
 
   Future<String> getTimerState() async {
     return _sharedPreferences.getString(TIMER_STATE_KEY);
+  }
+
+  Future<int> getLastTime() async {
+    return _sharedPreferences.getInt(LAST_TIME_KEY);
   }
 }

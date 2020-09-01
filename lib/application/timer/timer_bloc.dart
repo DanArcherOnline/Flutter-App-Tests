@@ -18,26 +18,58 @@ class TimerCubit extends Cubit<TimerState> {
         _ticker = ticker,
         super(TimerLoad());
 
+  calculateCurrentDuration(int lastTime, int lastDuration) {
+    print('calculateCurrentDuration==START=====================');
+    print('lastTime = $lastTime : lastDuration = $lastDuration');
+    final lastTimeDateTime = DateTime.fromMillisecondsSinceEpoch(lastTime);
+    final currentTimeDateTime = DateTime.now();
+    print(
+        'lastTimeDateTime = $lastTimeDateTime : currentTimeDateTime = $currentTimeDateTime');
+    final timeDifference = lastTimeDateTime.difference(currentTimeDateTime);
+    print('timeDifference = $timeDifference');
+    final timeDifferenceSecs = timeDifference.inSeconds;
+    print('timeDifferenceSecs = $timeDifferenceSecs');
+    final lastDurationSecs = Duration(seconds: lastDuration).inSeconds;
+    print('lastDurationSecs = $lastDurationSecs');
+    final currentDuration = lastDurationSecs + timeDifferenceSecs;
+    print('currentDuration = $currentDuration');
+    print('calculateCurrentDuration==END=====================');
+    return currentDuration;
+  }
+
   Future loadTimerFromBackUp() async {
     final manager = await PersistTimerStateManager.getInstance();
-    int backUpDuration = await manager.getRemainingDuration();
-    if (backUpDuration == null) {
+    String timerState = await manager.getTimerState();
+    if (timerState == null) {
       emit(TimerInitial(_duration));
     } else {
-      String timerState = await manager.getTimerState();
-      switch (timerState) {
-        case TimerState.INITIAL:
-          emit(TimerInitial(_duration));
-          break;
-        case TimerState.PAUSED:
-          emit(TimerRunPause(backUpDuration));
-          break;
-        case TimerState.RUNNING:
-          start(backUpDuration);
-          break;
-        case TimerState.COMPLETE:
+      int backUpDuration = await manager.getRemainingDuration();
+      int lastTime = await manager.getLastTime();
+      if (timerState != null && lastTime != null) {
+        int newBackUpDuration = timerState != TimerState.PAUSED
+            ? calculateCurrentDuration(lastTime, backUpDuration)
+            : backUpDuration;
+        if (newBackUpDuration < 0) {
           emit(TimerRunComplete());
-          break;
+        } else {
+          switch (timerState) {
+            case TimerState.INITIAL:
+              emit(TimerInitial(_duration));
+              break;
+            case TimerState.PAUSED:
+              emit(TimerRunPause(newBackUpDuration));
+              break;
+            case TimerState.RUNNING:
+              start(newBackUpDuration);
+              break;
+            case TimerState.COMPLETE:
+              emit(TimerRunComplete());
+              break;
+          }
+        }
+      } else {
+        print('Error: timerState & lastTime were null, '
+            'but backUpDuration was not null. ');
       }
     }
   }
